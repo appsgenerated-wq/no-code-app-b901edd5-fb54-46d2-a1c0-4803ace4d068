@@ -1,0 +1,32 @@
+name: Pearadise
+description: A web application to discover and catalog pear varieties.
+
+entities:
+  User:
+    authenticable: true
+    properties:
+      - { name: name, validation: { required: true } }
+      - { name: email, type: email, validation: { required: true, unique: true } }
+      - { name: role, type: choice, options: { values: [admin, user], default: user } }
+    access_policies:
+      - role: admin
+        permissions: [create, read, update, delete]
+      - role: user
+        permissions: [read, update]
+        condition: "user.id === id"
+
+  PearVariety:
+    properties:
+      - { name: name, validation: { required: true } }
+      - { name: description, type: text }
+      - { name: origin, type: string }
+      - { name: photo, type: image, options: { sizes: { thumbnail: { width: 400, height: 300 } } } }
+      - { name: ripeness, type: choice, options: { values: ['Unripe', 'Peak Ripeness', 'Overripe'], default: 'Peak Ripeness' } }
+    belongsTo:
+      - { name: owner, entity: User }
+    access_policies:
+      - role: admin
+        permissions: [create, read, update, delete]
+      - role: user
+        permissions: [create, read, update, delete]
+        condition: "user.id === owner.id"
